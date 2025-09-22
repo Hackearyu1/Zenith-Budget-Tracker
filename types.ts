@@ -7,7 +7,7 @@ export interface Category {
     id: string;
     name: string;
     color: string;
-    icon: React.ReactNode;
+    icon: string; // Changed from React.ReactNode to string key
 }
 
 export interface Transaction {

@@ -18,10 +18,7 @@ const AddCategoryForm: React.FC<AddCategoryFormProps> = ({ categoryToEdit, onClo
         if (categoryToEdit) {
             setName(categoryToEdit.name);
             setColor(categoryToEdit.color);
-            const key = Object.keys(SELECTABLE_ICONS).find(
-                key => (SELECTABLE_ICONS[key] as any)?.props?.children?.props?.d === (categoryToEdit.icon as any)?.props?.children?.props?.d
-            ) || Object.keys(SELECTABLE_ICONS)[0];
-            setIconKey(key);
+            setIconKey(categoryToEdit.icon);
         } else {
             // Reset to defaults for new category
             setName('');
@@ -37,7 +34,7 @@ const AddCategoryForm: React.FC<AddCategoryFormProps> = ({ categoryToEdit, onClo
         const categoryData = {
             name,
             color,
-            icon: SELECTABLE_ICONS[iconKey],
+            icon: iconKey,
         };
 
         if (categoryToEdit) {

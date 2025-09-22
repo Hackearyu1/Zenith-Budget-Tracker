@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Category } from '../types';
 import ProgressBar from './ProgressBar';
+import { ICONS } from '../constants';
 
 const Budgets: React.FC = () => {
     const { budgets, setBudget, categories, transactions } = useAppContext();
@@ -54,7 +55,7 @@ const Budgets: React.FC = () => {
                             <div key={category.id}>
                                 <div className="flex justify-between items-center mb-2">
                                     <div className="flex items-center gap-2">
-                                        <span className={category.color}>{category.icon}</span>
+                                        <span className={category.color}>{ICONS[category.icon] || ICONS.OTHER}</span>
                                         <span className="font-semibold">{category.name}</span>
                                     </div>
                                     <div className="text-sm font-medium text-slate-600 dark:text-slate-300">

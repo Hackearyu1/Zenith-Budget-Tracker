@@ -1,57 +1,14 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { Transaction, Category, Budget, TransactionType, ToastMessage } from '../types';
 import { INITIAL_CATEGORIES } from '../constants';
 
-// Sample data for demonstration
+// Sample data is now empty for production release.
 const getSampleTransactions = (): Transaction[] => {
-    const today = new Date();
-    const transactions: Transaction[] = [];
-    const descriptions = {
-        income: ["Salary", "Freelance Project", "Side Hustle"],
-        food: ["Groceries", "Restaurant", "Coffee Shop", "Takeout"],
-        bills: ["Rent", "Electricity Bill", "Internet Bill", "Phone Bill"],
-        entertainment: ["Movie Tickets", "Concert", "Streaming Service"],
-        travel: ["Gas", "Flight Tickets", "Hotel Booking"],
-        savings: ["Investment", "Emergency Fund"],
-        other: ["New Clothes", "Gadget Purchase", "Gym Membership"]
-    };
-
-    // Add some income
-    for (let i = 0; i < 2; i++) {
-        const date = new Date(today.getFullYear(), today.getMonth() - (i % 2), Math.floor(Math.random() * 28) + 1);
-        transactions.push({
-            id: crypto.randomUUID(),
-            description: descriptions.income[i % descriptions.income.length],
-            amount: parseFloat((Math.random() * 1000 + 1500).toFixed(2)),
-            categoryId: 'income',
-            date: date.toISOString().split('T')[0],
-            type: 'income',
-        });
-    }
-
-    // Add some expenses for this month and last month
-    for (let i = 0; i < 20; i++) {
-        const category = INITIAL_CATEGORIES.filter(c => c.id !== 'income')[i % 6];
-        const date = new Date(today.getFullYear(), today.getMonth() - (i % 2), Math.floor(Math.random() * 28) + 1);
-        transactions.push({
-            id: crypto.randomUUID(),
-            description: descriptions[category.id as keyof typeof descriptions][i % descriptions[category.id as keyof typeof descriptions].length],
-            amount: parseFloat((Math.random() * 100 + 10).toFixed(2)),
-            categoryId: category.id,
-            date: date.toISOString().split('T')[0],
-            type: 'expense',
-        });
-    }
-
-    return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return [];
 };
 
 const getSampleBudgets = (): Budget[] => {
-    return [
-        { categoryId: 'food', amount: 500 },
-        { categoryId: 'bills', amount: 1200 },
-        { categoryId: 'entertainment', amount: 150 },
-    ];
+    return [];
 };
 
 interface AppContextType {
@@ -72,11 +29,31 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
+    try {
+        const item = window.localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (error) {
+        console.error(`Error reading from localStorage key “${key}”:`, error);
+        return defaultValue;
+    }
+};
+
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [transactions, setTransactions] = useState<Transaction[]>(getSampleTransactions());
-    const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
-    const [budgets, setBudgets] = useState<Budget[]>(getSampleBudgets());
+    const [transactions, setTransactions] = useState<Transaction[]>(() => loadFromStorage('zenith_transactions', getSampleTransactions()));
+    const [categories, setCategories] = useState<Category[]>(() => loadFromStorage('zenith_categories', INITIAL_CATEGORIES));
+    const [budgets, setBudgets] = useState<Budget[]>(() => loadFromStorage('zenith_budgets', getSampleBudgets()));
     const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+    useEffect(() => {
+        try {
+            window.localStorage.setItem('zenith_transactions', JSON.stringify(transactions));
+            window.localStorage.setItem('zenith_categories', JSON.stringify(categories));
+            window.localStorage.setItem('zenith_budgets', JSON.stringify(budgets));
+        } catch (error) {
+            console.error('Error saving to localStorage:', error);
+        }
+    }, [transactions, categories, budgets]);
 
     const addToast = useCallback((message: string, type: 'success' | 'error') => {
         const id = Date.now();

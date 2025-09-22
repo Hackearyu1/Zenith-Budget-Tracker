@@ -22,13 +22,13 @@ export const ICONS: Record<string, React.ReactNode> = {
 };
 
 export const INITIAL_CATEGORIES: Category[] = [
-    { id: 'income', name: 'Income', color: 'text-green-500', icon: ICONS.INCOME },
-    { id: 'food', name: 'Food', color: 'text-orange-500', icon: ICONS.FOOD },
-    { id: 'bills', name: 'Bills', color: 'text-blue-500', icon: ICONS.BILLS },
-    { id: 'entertainment', name: 'Entertainment', color: 'text-purple-500', icon: ICONS.ENTERTAINMENT },
-    { id: 'travel', name: 'Travel', color: 'text-teal-500', icon: ICONS.TRAVEL },
-    { id: 'savings', name: 'Savings', color: 'text-indigo-500', icon: ICONS.SAVINGS },
-    { id: 'other', name: 'Other', color: 'text-slate-500', icon: ICONS.OTHER },
+    { id: 'income', name: 'Income', color: 'text-green-500', icon: 'INCOME' },
+    { id: 'food', name: 'Food', color: 'text-orange-500', icon: 'FOOD' },
+    { id: 'bills', name: 'Bills', color: 'text-blue-500', icon: 'BILLS' },
+    { id: 'entertainment', name: 'Entertainment', color: 'text-purple-500', icon: 'ENTERTAINMENT' },
+    { id: 'travel', name: 'Travel', color: 'text-teal-500', icon: 'TRAVEL' },
+    { id: 'savings', name: 'Savings', color: 'text-indigo-500', icon: 'SAVINGS' },
+    { id: 'other', name: 'Other', color: 'text-slate-500', icon: 'OTHER' },
 ];
 
 export const SELECTABLE_COLORS = [

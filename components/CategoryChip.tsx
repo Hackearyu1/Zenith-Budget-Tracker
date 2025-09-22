@@ -1,5 +1,6 @@
 import React from 'react';
 import { Category } from '../types';
+import { ICONS } from '../constants';
 
 interface CategoryChipProps {
     category?: Category;
@@ -29,7 +30,7 @@ const CategoryChip: React.FC<CategoryChipProps> = ({ category }) => {
     return (
         <span className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${bgColor}`}>
             <span className={`mr-1.5 ${category.color}`}>
-                {category.icon}
+                {ICONS[category.icon] || ICONS.OTHER}
             </span>
             {category.name}
         </span>

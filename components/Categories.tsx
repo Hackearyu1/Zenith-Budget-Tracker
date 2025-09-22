@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import Modal from './Modal';
 import AddCategoryForm from './AddCategoryForm';
 import { Category } from '../types';
-import { INITIAL_CATEGORIES } from '../constants';
+import { INITIAL_CATEGORIES, ICONS } from '../constants';
 
 const Categories: React.FC = () => {
     const { categories, deleteCategory } = useAppContext();
@@ -40,7 +40,7 @@ const Categories: React.FC = () => {
                     <div key={cat.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:scale-105">
                         <div>
                             <div className="flex items-center gap-3 mb-4">
-                                <span className={cat.color}>{cat.icon}</span>
+                                <span className={cat.color}>{ICONS[cat.icon] || ICONS.OTHER}</span>
                                 <h3 className="font-bold text-lg">{cat.name}</h3>
                             </div>
                             <div className="flex items-center gap-2">
