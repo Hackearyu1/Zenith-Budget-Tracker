@@ -18,6 +18,5 @@ This app offers multiple features:
 1. Tight budget.
 2. Focusing on goals.
 3. Keeping an eye.
--- 
-# Single Downside:
-The app follows a pattern of localstorage of your browser, the downfall will be fixed soon. NOT RECOMMENDED TO USE TILL THE UPDATE
+---
+
