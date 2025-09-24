@@ -1,26 +1,20 @@
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-<img width="1914" height="929" alt="{24A752F0-8A24-498B-A1CE-3E5E098101D2}" src="https://github.com/user-attachments/assets/7a30ffea-58c0-4db9-aded-684d714be764" />
-<img width="800" height="600" alt="{D91B9E12-776C-4B38-B26E-7C86759F60C1}" src="https://github.com/user-attachments/assets/6ea3272d-6f76-4882-a148-ed241587e669" />
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/drive/1YSPYs4yJ9hkluh-VR_fBMqlOpKZLEsxr
+
+## Run Locally
+
+**Prerequisites:**  Node.js
 
 
 1. Install dependencies:
    `npm install`
-2. Run the app:
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
    `npm run dev`
----
-# App Functions⚙️:
-This app offers multiple features:
-* Goals Tracking
-* Transiction
-* Recurring
-* Budget
-* Graphs
-* Reports
-* Basically everything you would expect from a Budget Tracking app.
----
-# Use Cases💡:
-1. Tight budget.
-2. Focusing on goals.
-3. Keeping an eye.
----
-

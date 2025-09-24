@@ -29,3 +29,9 @@ export interface ToastMessage {
     message: string;
     type: 'success' | 'error';
 }
+
+export interface AppStateData {
+    transactions: Transaction[];
+    categories: Category[];
+    budgets: Budget[];
+}

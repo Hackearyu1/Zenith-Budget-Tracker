@@ -1,15 +1,31 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { Transaction, Category, Budget, TransactionType, ToastMessage } from '../types';
+import { Transaction, Category, Budget, ToastMessage, AppStateData } from '../types';
 import { INITIAL_CATEGORIES } from '../constants';
 
-// Sample data is now empty for production release.
-const getSampleTransactions = (): Transaction[] => {
-    return [];
+const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
+    try {
+        const storedValue = localStorage.getItem(key);
+        if (storedValue) {
+            // A simple migration for old users who might have sample data.
+            if (key === 'transactions' && JSON.parse(storedValue).length > 0 && JSON.parse(storedValue)[0].description === 'Sample Income') {
+                 return defaultValue;
+            }
+            return JSON.parse(storedValue);
+        }
+    } catch (error) {
+        console.error(`Error loading ${key} from storage:`, error);
+    }
+    return defaultValue;
 };
 
-const getSampleBudgets = (): Budget[] => {
-    return [];
+const saveToStorage = <T,>(key: string, value: T) => {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        console.error(`Error saving ${key} to storage:`, error);
+    }
 };
+
 
 interface AppContextType {
     transactions: Transaction[];
@@ -25,35 +41,29 @@ interface AppContextType {
     getCategoryById: (id: string) => Category | undefined;
     toasts: ToastMessage[];
     addToast: (message: string, type: 'success' | 'error') => void;
+    importData: (file: File) => void;
+    exportData: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
-    try {
-        const item = window.localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-    } catch (error) {
-        console.error(`Error reading from localStorage key “${key}”:`, error);
-        return defaultValue;
-    }
-};
-
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [transactions, setTransactions] = useState<Transaction[]>(() => loadFromStorage('zenith_transactions', getSampleTransactions()));
-    const [categories, setCategories] = useState<Category[]>(() => loadFromStorage('zenith_categories', INITIAL_CATEGORIES));
-    const [budgets, setBudgets] = useState<Budget[]>(() => loadFromStorage('zenith_budgets', getSampleBudgets()));
+    const [transactions, setTransactions] = useState<Transaction[]>(() => loadFromStorage('transactions', []));
+    const [categories, setCategories] = useState<Category[]>(() => loadFromStorage('categories', INITIAL_CATEGORIES));
+    const [budgets, setBudgets] = useState<Budget[]>(() => loadFromStorage('budgets', []));
     const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
     useEffect(() => {
-        try {
-            window.localStorage.setItem('zenith_transactions', JSON.stringify(transactions));
-            window.localStorage.setItem('zenith_categories', JSON.stringify(categories));
-            window.localStorage.setItem('zenith_budgets', JSON.stringify(budgets));
-        } catch (error) {
-            console.error('Error saving to localStorage:', error);
-        }
-    }, [transactions, categories, budgets]);
+        saveToStorage('transactions', transactions);
+    }, [transactions]);
+    
+    useEffect(() => {
+        saveToStorage('categories', categories);
+    }, [categories]);
+
+    useEffect(() => {
+        saveToStorage('budgets', budgets);
+    }, [budgets]);
 
     const addToast = useCallback((message: string, type: 'success' | 'error') => {
         const id = Date.now();
@@ -62,6 +72,57 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id));
         }, 3000);
     }, []);
+
+    const importData = (file: File) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error("File could not be read");
+                }
+                const data: AppStateData = JSON.parse(text);
+
+                // Basic validation
+                if (Array.isArray(data.transactions) && Array.isArray(data.categories) && Array.isArray(data.budgets)) {
+                    const sortedTransactions = data.transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                    setTransactions(sortedTransactions);
+                    setCategories(data.categories);
+                    setBudgets(data.budgets);
+                    addToast('Data imported successfully!', 'success');
+                } else {
+                    throw new Error("Invalid data structure in file.");
+                }
+            } catch (error) {
+                console.error("Failed to import data:", error);
+                addToast('Failed to import data. Invalid file format.', 'error');
+            }
+        };
+        reader.onerror = () => {
+             addToast('Failed to read the file.', 'error');
+        }
+        reader.readAsText(file);
+    };
+
+    const exportData = () => {
+        try {
+            const data: AppStateData = { transactions, categories, budgets };
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zenith-budget-data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            addToast('Data exported successfully!', 'success');
+        } catch (error) {
+            console.error("Failed to export data:", error);
+            addToast('Failed to export data.', 'error');
+        }
+    };
 
     const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
         const newTransaction = { ...transaction, id: crypto.randomUUID() };
@@ -153,7 +214,9 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             setBudget,
             getCategoryById,
             toasts,
-            addToast
+            addToast,
+            importData,
+            exportData
         }}>
             {children}
             <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
